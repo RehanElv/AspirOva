@@ -43,13 +43,6 @@ include "../includes/navbar_utama.php";
                         Login
                     </button>
                 </form>
-
-                <!-- FOOTER -->
-                <div class="text-center mt-4">
-                    <span class="text-secondary">Belum punya akun?</span>
-                    <a href="daftar.php" class="text-decoration-none fw-medium text-primary">Daftar</a>
-                </div>
-
             </div>
         </div>
     </div>

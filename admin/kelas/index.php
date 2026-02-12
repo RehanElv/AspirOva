@@ -15,7 +15,9 @@ $total_kelas = mysqli_num_rows($q_kelas);
 $q_siswa = mysqli_query($koneksi, "SELECT id_user FROM tb_user WHERE role='siswa'");
 $total_siswa = mysqli_num_rows($q_siswa);
 ?>
-
+<head>
+<link rel="stylesheet" href="https://cdn.datatables.net/2.3.7/css/dataTables.dataTables.css" />
+</head>
 <?php include "../layout/header.php"; ?>
 <?php include "../layout/sidebar.php"; ?>
 
@@ -113,7 +115,7 @@ $total_siswa = mysqli_num_rows($q_siswa);
         </div>
 
         <!-- TABLE -->
-        <div class="card rounded-4 shadow-sm">
+        <div id="myTable" class="display card rounded-4 shadow-sm">
             <div class="card-body">
                 <h6 class="fw-bold mb-3">Daftar Kelas</h6>
 
@@ -209,5 +211,4 @@ $total_siswa = mysqli_num_rows($q_siswa);
 
     </main>
 </div>
-
 <?php include "../layout/footer.php"; ?>

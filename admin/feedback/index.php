@@ -6,16 +6,19 @@ if ($_SESSION['role'] != 'admin') {
 include "../../includes/koneksi.php";
 include "../../includes/baseurl.php";
 
-$title = "Feedback";
+$title = "Chat Feedback";
 $menu  = "feedback";
 
-$q_feedback = mysqli_query($koneksi, "SELECT id_feedback FROM tb_feedback");
-$total_feedback = mysqli_num_rows($q_feedback);
+// Ambil user ID dari query string
+$user_id = $_GET['user'] ?? 0;
 
-$q_aspirasi = mysqli_query($koneksi, "SELECT id_aspirasi FROM tb_aspirasi");
-$total_aspirasi = mysqli_num_rows($q_aspirasi);
+// Ambil nama siswa
+$user = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT nama FROM tb_user WHERE id_user='$user_id'"));
 ?>
 
+<head>
+    <link rel="stylesheet" href="<?= base_url . "assets/css/chat.css" ?>">
+</head>
 <?php include "../layout/header.php"; ?>
 <?php include "../layout/sidebar.php"; ?>
 
@@ -23,64 +26,58 @@ $total_aspirasi = mysqli_num_rows($q_aspirasi);
     <?php include "../layout/topbar.php"; ?>
 
     <!-- CONTENT -->
-    <main class="p-4 overflow-auto">
-        <h2 class="mb-4">Manajemen Feedback</h2>
+    <main class="p-4 overflow-auto v-100">
+        <h4>Chat dengan: <?= $user['nama'] ?></h4>
+        <div class="card shadow-sm mb-3" style="height: 400px; overflow-y: auto;" id="chatBox">
+            <div class="card-body d-flex flex-column" id="chatContent">
+                <?php
+                $chats = mysqli_query($koneksi, "
+                    SELECT feedback_chat.*, tb_user.nama 
+                    FROM feedback_chat
+                    JOIN tb_user ON tb_user.id_user = feedback_chat.user_id
+                    WHERE feedback_chat.user_id='$user_id'
+                    ORDER BY created_at ASC
+                ");
 
-        <!-- Card Statistik -->
-        <div class="row mb-4 d-flex align-items-center justify-content-center">
-            <div class="col-md-4">
-                <div class="card rounded-4 shadow-sm">
-                    <div class="card-body d-flex align-items-center gap-3">
-                        <div class="bg-info-subtle text-info rounded-3 p-3">
-                            <i class="bi bi-chat-dots-fill fs-4"></i>
+                while ($c = mysqli_fetch_assoc($chats)) {
+                    $isAdmin = $c['pengirim'] == 'admin';
+                ?>
+                    <div class="mb-2 <?= $isAdmin ? 'text-end' : 'text-start' ?>">
 
+                        <!-- TAG PENGIRIM -->
+                        <div class="chat-name mb-1">
+                            <?= $isAdmin ? 'Admin' : $c['nama']; ?>
                         </div>
-                        <div>
-                            <small class="text-muted">Total feedback</small>
-                            <h4 class="fw-bold mb-0"><?= $total_feedback ?></h4>
+
+
+                        <!-- BUBBLE CHAT -->
+                        <div class="chat-bubble d-inline-block <?= $isAdmin ? 'bg-primary text-white' : 'bg-success text-light' ?>">
+                            <?= $c['pesan'] ?>
                         </div>
+
+                        <!-- WAKTU -->
+                        <div class="chat-time">
+                            <?= date('H:i, d M', strtotime($c['created_at'])) ?>
+                        </div>
+
                     </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card rounded-4 shadow-sm">
-                    <div class="card-body d-flex align-items-center gap-3">
-                        <div class="bg-info-subtle text-info rounded-3 p-3">
-                            <i class="bi bi-chat-left-dots fs-4"></i>
-                        </div>
-                        <div>
-                            <small class="text-muted">Total Aspirasi</small>
-                            <h4 class="fw-bold mb-0"><?= $total_aspirasi ?></h4>
-                        </div>
-                    </div>
-                </div>
+
+                <?php } ?>
             </div>
         </div>
 
-
-
-
-
-        <!-- Daftar Aspirasi Singkat -->
-        <div class="card shadow-sm">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Aspirasi Terbaru</h5>
+        <!-- Form Kirim Pesan -->
+        <form method="POST" action="proses_chat.php">
+            <input type="hidden" name="user_id" value="<?= $user_id ?>">
+            <div class="chat-input-wrapper">
+                <input type="text" name="pesan" class="chat-input" placeholder="Tulis pesan..." required>
+                <button class="chat-send-btn" type="submit">
+                    Kirim
+                </button>
             </div>
-            <div class="card-body">
-                <div class="list-group">
-                    <?php
-                    $query = mysqli_query($koneksi, "SELECT a.*, u.nama FROM tb_aspirasi a JOIN tb_user u ON a.id_user=u.id_user ORDER BY a.created_at DESC LIMIT 5");
-                    while ($row = mysqli_fetch_assoc($query)) { ?>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong><?= $row['nama'] ?></strong> - <?= substr($row['isi_aspirasi'], 0, 50) ?>...
-                                <div class="text-muted small"><?= date('d M Y', strtotime($row['created_at'])) ?></div>
-                            </div>
-                            <a href="<?= base_url ?>admin/feedback/feedback_chat.php?user=<?= $row['id_user'] ?>" class="btn btn-primary btn-sm">Chat</a>
-                        </div>
-                    <?php } ?>
-                </div>
-            </div>
-        </div>
+
+        </form>
     </main>
 </div>
+
+<?php include "../layout/footer.php"; ?>

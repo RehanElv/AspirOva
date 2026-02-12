@@ -29,3 +29,5 @@ if ($hitung == 1) {
 } else {
     header("Location:../galat.php?pesan=Gagallogin");
 }
+
+?>

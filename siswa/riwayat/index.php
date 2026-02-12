@@ -6,7 +6,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != "siswa") {
 }
 
 include "../../includes/koneksi.php";
-include "../../includes/navbar_utama.php";
+include "../../includes/navbar_siswa.php";
 
 $id_user = $_SESSION['id_user'];
 
@@ -73,116 +73,136 @@ $aspirasi = mysqli_query($koneksi, "
                                 </small>
 
                                 <!-- ACTION BUTTON -->
-                                <?php if ($a['status'] == 'menunggu') { ?>
-                                    <div class="mt-3 d-flex gap-2">
+                                <?php
+                                $status = $a['status'];
+                                ?>
 
-                                        <button class="btn btn-sm btn-warning rounded-3"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#editModal<?= $a['id_aspirasi']; ?>">
-                                            Edit
-                                        </button>
+                                <?php if (in_array($status, ['menunggu', 'proses'])) { ?>
+                                    <div class="mt-3 d-flex gap-2 flex-wrap">
 
-                                        <button class="btn btn-sm btn-danger rounded-3"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#hapusModal<?= $a['id_aspirasi']; ?>">
-                                            Hapus
-                                        </button>
+                                        <!-- EDIT & HAPUS hanya saat menunggu -->
+                                        <?php if ($status == 'menunggu') { ?>
 
-                                        <!-- MODAL EDIT -->
-                                        <div class="modal fade" id="editModal<?= $a['id_aspirasi']; ?>" tabindex="-1">
-                                            <div class="modal-dialog">
-                                                <form action="edit_aspirasi.php" method="POST">
-                                                    <div class="modal-content rounded-4 border-0">
+                                            <button class="btn btn-sm btn-warning rounded-3 fs-6"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editModal<?= $a['id_aspirasi']; ?>">
+                                                Edit
+                                            </button>
 
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title">Edit Aspirasi</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                        </div>
+                                            <button class="btn btn-sm btn-danger rounded-3 fs-6"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#hapusModal<?= $a['id_aspirasi']; ?>">
+                                                Hapus
+                                            </button>
 
-                                                        <div class="modal-body">
+                                        <?php } ?>
 
-                                                            <input type="hidden" name="id_aspirasi"
-                                                                value="<?= $a['id_aspirasi']; ?>">
+                                        <!-- CHAT muncul saat menunggu & proses -->
+                                        <a href="../feedback/feedback_chat.php?id=<?= $a['id_aspirasi']; ?>"
+                                            class="btn btn-sm btn-primary rounded-3 ms-auto fs-6">
+                                            <i class="bi bi-chat-dots"></i> Chat
+                                        </a>
 
-                                                            <label class="form-label">Isi Aspirasi</label>
-                                                            <textarea name="isi_aspirasi"
-                                                                class="form-control rounded-3"
-                                                                rows="4"
-                                                                required><?= $a['isi_aspirasi']; ?></textarea>
+                                    </div>
 
-                                                        </div>
 
-                                                        <div class="modal-footer">
+                                    <!-- MODAL EDIT -->
+                                    <div class="modal fade" id="editModal<?= $a['id_aspirasi']; ?>" tabindex="-1">
+                                        <div class="modal-dialog">
+                                            <form action="edit_aspirasi.php" method="POST">
+                                                <div class="modal-content rounded-4 border-0">
+
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Edit Aspirasi</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+
+                                                    <div class="modal-body">
+
+                                                        <input type="hidden" name="id_aspirasi"
+                                                            value="<?= $a['id_aspirasi']; ?>">
+
+                                                        <label class="form-label">Isi Aspirasi</label>
+                                                        <textarea name="isi_aspirasi"
+                                                            class="form-control rounded-3"
+                                                            rows="4"
+                                                            required><?= $a['isi_aspirasi']; ?></textarea>
+
+                                                    </div>
+
+                                                    <div class="modal-footer">
+                                                        <button type="button"
+                                                            class="btn btn-light rounded-3"
+                                                            data-bs-dismiss="modal">Batal</button>
+
+                                                        <button type="submit"
+                                                            class="btn text-white rounded-3"
+                                                            style="background: linear-gradient(135deg,#6a8cff,#7b5cff);">
+                                                            Simpan Perubahan
+                                                        </button>
+                                                    </div>
+
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <!-- MODAL HAPUS -->
+                                    <div class="modal fade" id="hapusModal<?= $a['id_aspirasi']; ?>" tabindex="-1">
+                                        <div class="modal-dialog modal-sm">
+                                            <form action="hapus_aspirasi.php" method="POST">
+                                                <div class="modal-content rounded-4 border-0">
+
+                                                    <div class="modal-body text-center p-4">
+
+                                                        <input type="hidden" name="id_aspirasi"
+                                                            value="<?= $a['id_aspirasi']; ?>">
+
+                                                        <h5 class="mb-3">Hapus Aspirasi?</h5>
+                                                        <p class="text-muted small">
+                                                            Aspirasi yang dihapus tidak dapat dikembalikan.
+                                                        </p>
+
+                                                        <div class="d-flex gap-2 justify-content-center">
                                                             <button type="button"
                                                                 class="btn btn-light rounded-3"
                                                                 data-bs-dismiss="modal">Batal</button>
 
                                                             <button type="submit"
-                                                                class="btn text-white rounded-3"
-                                                                style="background: linear-gradient(135deg,#6a8cff,#7b5cff);">
-                                                                Simpan Perubahan
+                                                                class="btn btn-danger rounded-3">
+                                                                Hapus
                                                             </button>
                                                         </div>
 
                                                     </div>
-                                                </form>
-                                            </div>
+
+                                                </div>
+                                            </form>
                                         </div>
-
-                                        <!-- MODAL HAPUS -->
-                                        <div class="modal fade" id="hapusModal<?= $a['id_aspirasi']; ?>" tabindex="-1">
-                                            <div class="modal-dialog modal-sm">
-                                                <form action="hapus_aspirasi.php" method="POST">
-                                                    <div class="modal-content rounded-4 border-0">
-
-                                                        <div class="modal-body text-center p-4">
-
-                                                            <input type="hidden" name="id_aspirasi"
-                                                                value="<?= $a['id_aspirasi']; ?>">
-
-                                                            <h5 class="mb-3">Hapus Aspirasi?</h5>
-                                                            <p class="text-muted small">
-                                                                Aspirasi yang dihapus tidak dapat dikembalikan.
-                                                            </p>
-
-                                                            <div class="d-flex gap-2 justify-content-center">
-                                                                <button type="button"
-                                                                    class="btn btn-light rounded-3"
-                                                                    data-bs-dismiss="modal">Batal</button>
-
-                                                                <button type="submit"
-                                                                    class="btn btn-danger rounded-3">
-                                                                    Hapus
-                                                                </button>
-                                                            </div>
-
-                                                        </div>
-
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-
                                     </div>
-                                <?php } ?>
 
                             </div>
+                        <?php } ?>
+
+
+
                         </div>
                     </div>
-
-
-                <?php } ?>
-
             </div>
 
-        <?php } else { ?>
-
-            <div class="text-center py-5">
-                <h5 class="text-muted">Belum ada aspirasi</h5>
-                <p class="text-muted">Silakan buat aspirasi baru terlebih dahulu.</p>
-            </div>
 
         <?php } ?>
 
     </div>
+
+<?php } else { ?>
+
+    <div class="text-center py-5">
+        <h5 class="text-muted">Belum ada aspirasi</h5>
+        <p class="text-muted">Silakan buat aspirasi baru terlebih dahulu.</p>
+    </div>
+
+<?php } ?>
+
+</div>
 </main>

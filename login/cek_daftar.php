@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $id_kelas       = $_POST['id_kelas'];
 
     // hash password supaya aman
-    $password_hash = password_hash($password, PASSWORD_DEFAULT);
+    $password_hash = md5($password, PASSWORD_DEFAULT);
 
     // query simpan data
     $query = "INSERT INTO tb_user 
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     if ($simpan) {
         echo "<script>
                 alert('Pendaftaran berhasil');
-                window.location='login.php';
+                window.location='index.php';
               </script>";
     } else {
         echo "<script>

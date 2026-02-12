@@ -26,6 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // kembali ke halaman chat
-    header("location:feedback_chat.php?user=" . $user_id);
+    header("location:index.php?user=" . $user_id);
     exit;
 }
